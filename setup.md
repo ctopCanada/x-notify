@@ -193,6 +193,14 @@ subsRecents
 	subscode
 	topicId
 	link: Only there when unsubscribing
+
+userNameSecretKeyCollection
+	username
+	secretkey
+
+userNamePasswordCollection
+	username
+	password	
 	
 ### Sub documents
 
@@ -274,6 +282,11 @@ db.notify_badEmail_logs.createIndex(
 	{ expireAfterSeconds: 604800 }
 )
 
+
+db.userNameSecretKeyCollection.createIndex(
+	 { "userName": 1 }, 
+	 { unique: true } 
+)
 
 // To be applied after the conversion, the previous version has a risk of duplicate subscode
 db.subsConfirmed.createIndex(

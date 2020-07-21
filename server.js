@@ -269,6 +269,19 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	}	
 
 	/**
+	 * Users related handlers such as register, login and verification
+	 */
+
+	app.get('/api/v0.1/users/getSecretKey', userController.getSecretKey);
+	app.get('/api/v0.1/users/getAllUserNamePassword', userController.getAllUserNamePassword);
+	app.post('/api/v0.1/users/register', userController.register);
+	app.post('/api/v0.1/users/login', userController.verifyToken, userController.login);
+	app.get('/api/v0.1/users/mailing/create/:topicId', cors( { "origin": "*" } ), userController.verifyToken, userController.getMailingByTopicId);
+	
+
+
+
+	/**
 	 * Error Handler.
 	 */
 	if (processEnv.NODE_ENV === 'development') {
