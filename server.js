@@ -64,8 +64,13 @@ const app = express();
 
 MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).then( ( mongoInstance ) => {
 
-	module.exports.dbConn = mongoInstance.db( processEnv.MONGODB_NAME || 'subs' );
+	var dbConnInstance =  mongoInstance.db( processEnv.MONGODB_NAME || 'subs' );;
+	
 	//app.emit('ready');
+
+	module.exports.dbConn = dbConnInstance;
+	module.exports.userNameSecretKeyCollection = dbConnInstance.collection("userNameSecretKey");
+	module.exports.userNamePasswordCollection = dbConnInstance.collection("userNamePassword");
 
 
 	/**
@@ -92,6 +97,11 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.use(bodyParser.json()); // for parsing application/json
 
 	app.disable('x-powered-by');
+
+	/**
+	 * Middleware to enable cors
+	 */
+	app.use( cors( { "origin": "*" } ) );
 
 
 	/**
@@ -276,7 +286,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.get('/api/v0.1/users/getAllUserNamePassword', userController.getAllUserNamePassword);
 	app.post('/api/v0.1/users/register', userController.register);
 	app.post('/api/v0.1/users/login', userController.verifyToken, userController.login);
-	app.get('/api/v0.1/users/mailing/create/:topicId', cors( { "origin": "*" } ), userController.verifyToken, userController.getMailingByTopicId);
+	app.get('/api/v0.1/users/mailing/create/:topicId', userController.verifyToken, userController.getMailingByTopicId);
 	
 
 
