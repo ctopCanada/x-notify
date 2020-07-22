@@ -25,9 +25,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-const userNameSecretKeyCollection = module.parent.exports.userNameSecretKeyCollection;
+//const usersecretkeys = module.parent.exports.usersecretkeys;
 
-const userNamePasswordCollection = module.parent.exports.userNamePasswordCollection;
+//const users = module.parent.exports.users;
 
 let keyMap = new Map()
 const NO_USER = "noUser";
@@ -82,25 +82,27 @@ passport.deserializeUser( ( id, done ) => {
 /**
  * Sign in using Email and Password.
  */
-passport.use(new LocalStrategy({ usernameField: 'username' }, (email, password, done) => {
+passport.use(new LocalStrategy({ usernameField: 'username' }, (username, password, done) => {
 
 	// Query MongoDb to get the User info.
 	dbConn.collection( "users" ).findOne( {
-			name: email,
-			pass: password
-		},
-		{
-			projection: {
-				_id: 1,
-				email: 1,
-				accessToTopicId: 1
-			}
-		} ).then( ( rDoc ) => {
-			
+			name: username
+		}).then( ( rDoc ) => {
 			if ( !rDoc ) {
-				return done(null, false, { msg: 'Invalid email or password.' } )
+				console.log("That username "  + username + "is not registered");
+				return done(null, false, { msg: 'That username is not registered' } )
 			}
 			
+			 // Match password
+			 bcrypt.compare(password, rDoc.password, (err, isMatch) => {
+				if (err) throw err;
+				if (isMatch) {
+				  return done(null, rDoc);
+				} else {
+				  return done(null, false, { message: 'Password incorrect' });
+				}
+			  });
+
 			return done( null, rDoc );
 			
 		} );
@@ -125,9 +127,9 @@ exports.getSecretKey = ( req, res, next ) => {
 	keyMap.set(NO_USER, secretkey);
 
 	
-	userNameSecretKeyCollection.replaceOne( 
-		{ username: NO_USER },
-		{ username: NO_USER, secretkey: secretkey },
+	dbConn.collection( "usersecretkeys" ).replaceOne( 
+		{ name: NO_USER },
+		{ name: NO_USER, secretkey: secretkey },
 		{ upsert : true}
 	).then( () => {
 		console.log("1 document inserted on api /test/getSecretKey ");
@@ -143,7 +145,7 @@ exports.getSecretKey = ( req, res, next ) => {
 // Get all the username Password 
 exports.getAllUserNamePassword = ( req, res, next ) => {
 	
-	userNamePasswordCollection.find({}).toArray(function(err, result) {
+	dbConn.collection( "users" ).find({}).toArray(function(err, result) {
 		if (err) throw err;
 		console.log(result);
 		res.sendStatus(200);
@@ -154,11 +156,11 @@ exports.getAllUserNamePassword = ( req, res, next ) => {
 exports.register = ( req, res, next ) => {
 	
 	
-	var { username,  password } = req.body;
-	console.log(username + " as username and password " + password);
+	var { name,  password } = req.body;
+	console.log(name + " as username and password " + password);
 	let errors = [];
 
-	userNamePasswordCollection.findOne({ username: username }).then(user => {
+	dbConn.collection( "users" ).findOne({ name: name }).then(user => {
 		if (user) {
 		  errors.push({ msg: 'UserName already exists' });
 		  console.log("UserName already exists");
@@ -168,7 +170,7 @@ exports.register = ( req, res, next ) => {
 			bcrypt.hash(password, salt, (err, hash) => {
 			  if (err) throw err;
 			  password = hash;
-			  userNamePasswordCollection.insertOne({username: username, password: password})
+			  dbConn.collection( "users" ).insertOne({name: name, password: password})
 			   .then(user => {
 				console.log("You are now registered and can log in");
 				//res.redirect('/users/login');
@@ -193,14 +195,14 @@ exports.login = ( req, res, next ) => {
 	//console.log( req.headers );
 	//console.log( req.body );
 
-	const username = req.body.username;
+	const name = req.body.username;
 	const password = req.body.password;
-	console.log("username is " + username + " and password is " + password);
+	console.log("username is " + name + " and password is " + password);
 	var secretkey;
 
 	// Match user
-	userNamePasswordCollection.findOne({
-		username: username
+	dbConn.collection( "users" ).findOne({
+		name: name
 		  }).then(user => {
 		if (!user) {
 			console.log("That email is not registered");
@@ -213,11 +215,11 @@ exports.login = ( req, res, next ) => {
 				  console.log("Password is matched and user can login");
 				  secretkey =  crypto.randomBytes(64).toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
 				  console.log(secretkey);
-				  keyMap.set(username, secretkey);
+				  keyMap.set(name, secretkey);
 			  
-				  userNameSecretKeyCollection.replaceOne( 
-					  { username: username },
-					  { username: username, secretkey: secretkey },
+				  dbConn.collection( "usersecretkeys" ).replaceOne( 
+					  { name: name },
+					  { name: name, secretkey: secretkey },
 					  { upsert: true }
 				  ).then( () => {
 					  console.log("1 document inserted on api /test/login");
@@ -313,15 +315,15 @@ exports.verifyToken = (req, res, next) => {
 		secretkey = keyMap.get(userNameFromPayload);
 
 	  
-		userNameSecretKeyCollection.find({}).toArray(function(err, result) {
+		dbConn.collection( "usersecretkeys" ).find({}).toArray(function(err, result) {
 			if (err) throw err;
 			console.log(result);
 		  });
 
-		userNameSecretKeyCollection.findOne(
-			{ username: userNameFromPayload	}
+		dbConn.collection( "usersecretkeys" ).findOne(
+			{ name: userNameFromPayload	}
 		).then((documentRecord) => {
-			console.log("username in payload in verify : " + documentRecord.username);
+			console.log("username in payload in verify : " + documentRecord.name);
 			console.log("secretkey in mongoDb : " + documentRecord.secretkey);
 			jwt.verify(token, documentRecord.secretkey, (err, decoded) => {
 				console.log(err)
