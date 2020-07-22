@@ -255,7 +255,7 @@ mailingHistory
 
 users
 * name
-* pass
+* password
 * email
 * accessToTopicId: Array of topicID 
 

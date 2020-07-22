@@ -102,8 +102,6 @@ passport.use(new LocalStrategy({ usernameField: 'username' }, (username, passwor
 				  return done(null, false, { message: 'Password incorrect' });
 				}
 			  });
-
-			return done( null, rDoc );
 			
 		} );
 }));
@@ -156,7 +154,7 @@ exports.getAllUserNamePassword = ( req, res, next ) => {
 exports.register = ( req, res, next ) => {
 	
 	
-	var { name,  password } = req.body;
+	var { name,  password, accessToTopicId } = req.body;
 	console.log(name + " as username and password " + password);
 	let errors = [];
 
@@ -170,7 +168,7 @@ exports.register = ( req, res, next ) => {
 			bcrypt.hash(password, salt, (err, hash) => {
 			  if (err) throw err;
 			  password = hash;
-			  dbConn.collection( "users" ).insertOne({name: name, password: password})
+			  dbConn.collection( "users" ).insertOne({name: name, password: password, accessToTopicId : accessToTopicId})
 			   .then(user => {
 				console.log("You are now registered and can log in");
 				//res.redirect('/users/login');

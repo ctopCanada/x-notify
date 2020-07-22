@@ -223,6 +223,8 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 		userController.isAuthenticated,
 		bodyParser.urlencoded({extended:true, limit: '250k'}),
 		mailingController.v_mailingManage);
+
+		
 	app.post('/api/v1/mailing/create',
 		userController.isAuthenticated,
 		bodyParser.urlencoded({extended:true, limit: '250k'}),
