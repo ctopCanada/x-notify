@@ -214,17 +214,17 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.get( '/api/v1/mailing/login', mailingController.v_mailingLogin );
 	
 	app.post( '/api/v1/mailing/login',
-		bodyParser.urlencoded({extended:true, limit: '50k'}),
+		bodyParser.urlencoded({extended:true, limit: '1000k'}), userController.verifyToken,
 		passport.authenticate('local', { successRedirect: '/api/v1/mailing/manage', failureRedirect: '/api/v1/mailing/login'} ) );
 	
 	app.get( '/api/v1/mailing/logout', userController.logout );
 		
 	app.get('/api/v1/mailing/manage',
 		userController.isAuthenticated,
-		bodyParser.urlencoded({extended:true, limit: '250k'}),
+		bodyParser.urlencoded({extended:true, limit: '1000k'}),
 		mailingController.v_mailingManage);
 
-		
+
 	app.post('/api/v1/mailing/create',
 		userController.isAuthenticated,
 		bodyParser.urlencoded({extended:true, limit: '250k'}),

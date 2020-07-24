@@ -25,10 +25,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-//const usersecretkeys = module.parent.exports.usersecretkeys;
-
-//const users = module.parent.exports.users;
-
 let keyMap = new Map()
 const NO_USER = "noUser";
 
