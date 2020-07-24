@@ -25,6 +25,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
+//const usersecretkeys = module.parent.exports.usersecretkeys;
+
+//const users = module.parent.exports.users;
+
 let keyMap = new Map()
 const NO_USER = "noUser";
 
@@ -335,3 +339,28 @@ exports.verifyToken = (req, res, next) => {
 	}
 
   }
+
+
+
+  
+// update collection user secret key collection 
+
+
+exports.updateUserSecretKeyCollection = (secretkey) => {
+	let dbConn = module.parent.parent.exports.dbConn
+	console.log(" dbConn " + dbConn);
+	dbConn.collection( "usersecretkeys" ).replaceOne( 
+		{ name: NO_USER },
+		{ name: NO_USER, secretkey: secretkey },
+		{ upsert : true}
+	).then( () => {
+		console.log("1 document inserted on api /api/v1/mailing/login ");
+	}).catch( ( e ) => { 
+		console.log( "err while generate secretKey on api /test/getSecretKey" );
+		console.log( e );
+	});
+
+};
+
+
+

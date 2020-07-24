@@ -63,9 +63,6 @@ exports.v_mailingLogin = async ( req, res, next ) => {
 	
 	let secretkey =  crypto.randomBytes(64).toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
 	console.log("secretKey is created " + secretkey);
-	// first loading to get secret key, there is no way to get to know the user info
-	//keyMap.set(NO_USER, secretKey);
-
 
 	dbConn.collection( "usersecretkeys" ).replaceOne( 
 		{ name: NO_USER },
