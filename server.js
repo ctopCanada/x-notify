@@ -64,14 +64,7 @@ const app = express();
 
 MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).then( ( mongoInstance ) => {
 
-	var dbConnInstance =  mongoInstance.db( processEnv.MONGODB_NAME || 'subs' );;
-	
-	//app.emit('ready');
-
-	module.exports.dbConn = dbConnInstance;
-	module.exports.userNameSecretKeyCollection = dbConnInstance.collection("userNameSecretKey");
-	module.exports.userNamePasswordCollection = dbConnInstance.collection("userNamePassword");
-
+	module.exports.dbConn = mongoInstance.db( processEnv.MONGODB_NAME || 'subs' );
 
 	/**
 	 * Controllers (route handlers).
