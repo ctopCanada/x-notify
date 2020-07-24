@@ -220,7 +220,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.get( '/api/v1/mailing/logout', userController.logout );
 		
 	app.get('/api/v1/mailing/manage',
-		userController.isAuthenticated,
+		userController.isAuthenticated, 
 		bodyParser.urlencoded({extended:true, limit: '1000k'}),
 		mailingController.v_mailingManage);
 
