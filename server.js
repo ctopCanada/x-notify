@@ -108,13 +108,13 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	/**
 	 * Subscriber routes.
 	 */
-	app.get('/api/v0.1/subs/postkey', subsController.getKey);
-	app.post('/api/v0.1/subs/email/add',
+	app.get('/api/v1/subs/postkey', subsController.getKey);
+	app.post('/api/v1/subs/email/add',
 		// Need to do more testing
 		// passport.authenticate('basic', { session: false }),
 		subsController.addEmail);
-	//app.post('/api/v0.1/subs/email/confirm', subsController.confirmEmail); // TODO: need to handle data from "post"
-	//app.post('/api/v0.1/subs/email/remove', subsController.removeEmail); // TODO: need to handle data from "post"
+	//app.post('/api/v1/subs/email/confirm', subsController.confirmEmail); // TODO: need to handle data from "post"
+	//app.post('/api/v1/subs/email/remove', subsController.removeEmail); // TODO: need to handle data from "post"
 	
 	app.get('/subs/confirm/:subscode/:emlParam', subsController.confirmEmail); // Deprecated, to be removed after 60 days of it's deployment date
 	app.get('/subs/remove/:subscode/:emlParam', subsController.removeEmail); // Deprecated, to be removed after 60 days of it's deployment date
@@ -123,66 +123,66 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.post('/subs/post',
 		bodyParser.urlencoded({extended:false, limit: '10kb'}),
 		subsController.addEmailPOST);
-	// app.get('/api/v0.1/subs/email/getAll', subsController.getAll); // TODO: kept for later if we create a "subscription" management page.
+	// app.get('/api/v1/subs/email/getAll', subsController.getAll); // TODO: kept for later if we create a "subscription" management page.
 
 
 
 	/**
 	 * Manager routes.
 	 */
-	app.get('/api/v0.1/t-manager/:accessCode/home',
+	app.get('/api/v1/t-manager/:accessCode/home',
 		passport.authenticate('basic', { session: false }),
 		managersController.serveHome);
-	app.post('/api/v0.1/t-manager/:accessCode/topic',
+	app.post('/api/v1/t-manager/:accessCode/topic',
 		passport.authenticate('basic', { session: false }),
 		bodyParser.urlencoded({extended:false, limit: '10kb'}),
 		managersController.createTopic);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId',
+	app.get('/api/v1/t-manager/:accessCode/:topicId',
 		passport.authenticate('basic', { session: false }),
 		managersController.getTopic);
-	app.put('/api/v0.1/t-manager/:accessCode/:topicId',
+	app.put('/api/v1/t-manager/:accessCode/:topicId',
 		passport.authenticate('basic', { session: false }),
 		managersController.modifyTopic);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/modSuccess',
+	app.get('/api/v1/t-manager/:accessCode/:topicId/modSuccess',
 		passport.authenticate('basic', { session: false }),
 		managersController.showModSuccess);
-	app.delete('/api/v0.1/t-manager/:accessCode/:topicId/',
+	app.delete('/api/v1/t-manager/:accessCode/:topicId/',
 		passport.authenticate('basic', { session: false }),
 		managersController.deleteTopic);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/deleteSuccess',
+	app.get('/api/v1/t-manager/:accessCode/:topicId/deleteSuccess',
 		passport.authenticate('basic', { session: false }),
 		managersController.showDeleteSuccess);
-	//app.param('/api/v0.1/t-manager/:code/:topic', managersController.validateCodeTopic);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/list',
+	//app.param('/api/v1/t-manager/:code/:topic', managersController.validateCodeTopic);
+	app.get('/api/v1/t-manager/:accessCode/:topicId/list',
 		passport.authenticate('basic', { session: false }),
 		managersController.getTopicSubs);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/list-upload',
+	app.get('/api/v1/t-manager/:accessCode/:topicId/list-upload',
 		passport.authenticate('basic', { session: false }),
 		managersController.uploadTopicSubs);	
-	app.post('/api/v0.1/t-manager/:accessCode/:topicId/list',
+	app.post('/api/v1/t-manager/:accessCode/:topicId/list',
 		passport.authenticate('basic', { session: false }),
 		bodyParser.urlencoded({extended:true, limit: '250k'}),
 		managersController.getTopicOver50kSubs);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/bulk/form',
+	app.get('/api/v1/t-manager/:accessCode/:topicId/bulk/form',
 		passport.authenticate('basic', { session: false }),
 		managersController.serveBulkForm);
-	app.get('/api/v0.1/t-manager/:topicId/stats',
+	app.get('/api/v1/t-manager/:topicId/stats',
 		passport.authenticate('basic', { session: false }),
 		managersController.getTopicStats);
-	app.post('/api/v0.1/t-manager/:accessCode/:topicId/bulk/action',
+	app.post('/api/v1/t-manager/:accessCode/:topicId/bulk/action',
 		passport.authenticate('basic', { session: false }),
 		bodyParser.urlencoded({extended:true, limit: '50mb'}),
 		managersController.actionBulk);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/email/add/test',
+	app.get('/api/v1/t-manager/:accessCode/:topicId/email/add/test',
 		passport.authenticate('basic', { session: false }),
 		subsController.testAdd);
-	app.get('/api/v0.1/t-manager/:topicId/:prefix/:suffix/test/addJSON',
+	app.get('/api/v1/t-manager/:topicId/:prefix/:suffix/test/addJSON',
 		subsController.simulateAddJSON);
-	app.get('/api/v0.1/t-manager/:topicId/:prefix/:suffix/test/addPost',
+	app.get('/api/v1/t-manager/:topicId/:prefix/:suffix/test/addPost',
 		subsController.simulateAddPost);
-	app.get('/api/v0.1/t-manager/:topicId/test/sendsmtpPOST',
+	app.get('/api/v1/t-manager/:topicId/test/sendsmtpPOST',
 		smtpController.testsendMailPOST);
-	app.post('/api/v0.1/t-manager/:topicId/confirmedSubscribers', 
+	app.post('/api/v1/t-manager/:topicId/confirmedSubscribers', 
 		verifyJWT,
 		managersController.getAllConfSubs);
 
@@ -190,7 +190,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	 * Admin routes.
 	 */
 	// app.get('/subs/remove_unconfirm/:subscode/:email', subsController.removeUnconfirmEmail);
-	app.get('/api/v0.1/t-manager/:accessCode/:topicId/flush-cache',
+	app.get('/api/v1/t-manager/:accessCode/:topicId/flush-cache',
 		passport.authenticate('basic', { session: false }),
 		smtpController.flushCacheSMTP,
 		subsController.flushCache);
@@ -258,7 +258,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	/**
 	 * SMTP Mail routes.
 	 */
-	app.get('/api/v0.1/eml/postkey', smtpController.getKey);
+	app.get('/api/v1/eml/postkey', smtpController.getKey);
 	app.post('/eml/send',
 		cors(_corsSettings),
 		bodyParser.urlencoded({extended:false, limit: '10kb'}),
@@ -286,11 +286,11 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	 * Users related handlers such as register, login and verification
 	 */
 
-	app.get('/api/v0.1/users/getSecretKey', userController.getSecretKey);
-	app.get('/api/v0.1/users/getAllUserNamePassword', userController.getAllUserNamePassword);
-	app.post('/api/v0.1/users/register', userController.register);
-	app.post('/api/v0.1/users/login', userController.verifyToken, userController.login);
-	app.get('/api/v0.1/users/mailing/create/:topicId', userController.verifyToken, userController.getMailingByTopicId);
+	app.get('/api/v1/users/getSecretKey', userController.getSecretKey);
+	app.get('/api/v1/users/getAllUserNamePassword', userController.getAllUserNamePassword);
+	app.post('/api/v1/users/register', userController.register);
+	app.post('/api/v1/users/login', userController.verifyToken, userController.login);
+	app.get('/api/v1/users/mailing/create/:topicId', userController.verifyToken, userController.getMailingByTopicId);
 	
 
 

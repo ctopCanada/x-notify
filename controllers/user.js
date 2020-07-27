@@ -32,6 +32,8 @@ const crypto = require('crypto');
 let keyMap = new Map()
 const NO_USER = "noUser";
 
+const ERROR_MSG = "Username or/and password incorrect";
+
 
 let memoryUserSession = {}; // Schema: "userId": { {user config} + ttl } 
 
@@ -90,7 +92,7 @@ passport.use(new LocalStrategy({ usernameField: 'username' }, (username, passwor
 		}).then( ( rDoc ) => {
 			if ( !rDoc ) {
 				console.log("That username "  + username + "is not registered");
-				return done(null, false, { msg: 'That username is not registered' } )
+				return done(null, false, { msg: ERROR_MSG} )
 			}
 			
 			 // Match password
@@ -99,7 +101,7 @@ passport.use(new LocalStrategy({ usernameField: 'username' }, (username, passwor
 				if (isMatch) {
 				  return done(null, rDoc);
 				} else {
-				  return done(null, false, { message: 'Password incorrect' });
+				  return done(null, false, { message: ERROR_MSG });
 				}
 			  });
 			
@@ -227,7 +229,7 @@ exports.login = ( req, res, next ) => {
 					  console.log( e );
 				  });
 				} else {
-				  console.log("Password incorrect");
+				  console.log(ERROR_MSG);
 				}
 			  });
 		 }

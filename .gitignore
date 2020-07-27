@@ -9,3 +9,6 @@ Thumbs.db
 
 # Instance configuration files
 .env
+
+# FOR vscode 
+.vscode/launch.json
