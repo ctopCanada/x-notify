@@ -83,7 +83,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	const adminController = require('./controllers/admin');
 	const mailingController = require('./controllers/mailing_view');
 	const userController = require('./controllers/user');
-	
+	const userLoginController = require('./controllers/user_view');
 
 	/**
 	 * Express configuration.
@@ -212,7 +212,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.use(passport.session());
 	
 	
-	app.get( '/api/v1/mailing/login', userController.v_mailingLogin );
+	app.get( '/api/v1/mailing/login', userLoginController.v_mailingLogin );
 	
 	app.post( '/api/v1/mailing/login',
 		bodyParser.urlencoded({extended:true, limit: '1000k'}), userController.verifyToken,

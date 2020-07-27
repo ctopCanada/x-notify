@@ -91,7 +91,7 @@ passport.use(new LocalStrategy({ usernameField: 'username' }, (username, passwor
 			name: username
 		}).then( ( rDoc ) => {
 			if ( !rDoc ) {
-				console.log("That username "  + username + "is not registered");
+				console.log("That username "  + username + " is not registered");
 				return done(null, false, { msg: ERROR_MSG} )
 			}
 			
@@ -205,8 +205,8 @@ exports.login = ( req, res, next ) => {
 		name: name
 		  }).then(user => {
 		if (!user) {
-			console.log("That email is not registered");
-			res.status(500).send('The email is not registered');
+			console.log(ERROR_MSG);
+			res.status(500).send(ERROR_MSG);
 		 }  else {
 		// Match password
 		bcrypt.compare(password, user.password, (err, isMatch) => {
@@ -341,63 +341,5 @@ exports.verifyToken = (req, res, next) => {
 	}
 
   }
-
-
-/*
- * Mailing login
- */
-const fsPromises = require('fs').promises;
-const mustache = require('mustache');
-exports.v_mailingLogin = async ( req, res, next ) => {
-
-	
-	let secretkey =  crypto.randomBytes(64).toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
-	console.log("secretKey is created " + secretkey);
-
-	dbConn.collection( "usersecretkeys" ).replaceOne( 
-		{ name: NO_USER },
-		{ name: NO_USER, secretkey: secretkey },
-		{ upsert : true}
-	).then( () => {
-		console.log("1 document inserted on api /api/v1/mailing/login ");
-	}).catch( ( e ) => { 
-		console.log( "err while generate secretKey on api /test/getSecretKey" );
-		console.log( e );
-	});
-
-	
-	var mailingLoginTemplate = await fsPromises.readFile('views/mailingLogin.mustache', 'UTF-8');
-
-	mailingLoginTemplate = mustache.render(mailingLoginTemplate,
-		{
-			secretkey: secretkey
-				
-		}
-);
-	
-    res.status( 200 ).send(mailingLoginTemplate);
-}
-
-  
-// update collection user secret key collection 
-
-
-/*exports.updateUserSecretKeyCollection = (dbConn2, secretkey) => {
-	//let dbConn_2 = module.parent.parent.exports.dbConn
-	//var dbConn = req.app.locals.dbConn;
-	//console.log(" dbConn_2 " + dbConn_2);
-	dbConn2.collection( "usersecretkeys" ).replaceOne( 
-		{ name: NO_USER },
-		{ name: NO_USER, secretkey: secretkey },
-		{ upsert : true}
-	).then( () => {
-		console.log("1 document inserted on api /api/v1/mailing/login ");
-	}).catch( ( e ) => { 
-		console.log( "err while generate secretKey on api /test/getSecretKey" );
-		console.log( e );
-	});
-
-};*/
-
 
 
