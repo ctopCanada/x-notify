@@ -341,14 +341,17 @@ exports.verifyToken = (req, res, next) => {
   }
 
 
+/*
+ * Mailing login
+ */
+const fsPromises = require('fs').promises;
+const mustache = require('mustache');
+exports.v_mailingLogin = async ( req, res, next ) => {
 
-  
-// update collection user secret key collection 
+	
+	let secretkey =  crypto.randomBytes(64).toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
+	console.log("secretKey is created " + secretkey);
 
-
-exports.updateUserSecretKeyCollection = (secretkey) => {
-	let dbConn = module.parent.parent.exports.dbConn
-	console.log(" dbConn " + dbConn);
 	dbConn.collection( "usersecretkeys" ).replaceOne( 
 		{ name: NO_USER },
 		{ name: NO_USER, secretkey: secretkey },
@@ -360,7 +363,39 @@ exports.updateUserSecretKeyCollection = (secretkey) => {
 		console.log( e );
 	});
 
-};
+	
+	var mailingLoginTemplate = await fsPromises.readFile('views/mailingLogin.mustache', 'UTF-8');
+
+	mailingLoginTemplate = mustache.render(mailingLoginTemplate,
+		{
+			secretkey: secretkey
+				
+		}
+);
+	
+    res.status( 200 ).send(mailingLoginTemplate);
+}
+
+  
+// update collection user secret key collection 
+
+
+/*exports.updateUserSecretKeyCollection = (dbConn2, secretkey) => {
+	//let dbConn_2 = module.parent.parent.exports.dbConn
+	//var dbConn = req.app.locals.dbConn;
+	//console.log(" dbConn_2 " + dbConn_2);
+	dbConn2.collection( "usersecretkeys" ).replaceOne( 
+		{ name: NO_USER },
+		{ name: NO_USER, secretkey: secretkey },
+		{ upsert : true}
+	).then( () => {
+		console.log("1 document inserted on api /api/v1/mailing/login ");
+	}).catch( ( e ) => { 
+		console.log( "err while generate secretKey on api /test/getSecretKey" );
+		console.log( e );
+	});
+
+};*/
 
 
 

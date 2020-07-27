@@ -69,10 +69,11 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	//app.emit('ready');
 
 	module.exports.dbConn = dbConnInstance;
-	module.exports.userNameSecretKeyCollection = dbConnInstance.collection("userNameSecretKey");
-	module.exports.userNamePasswordCollection = dbConnInstance.collection("userNamePassword");
+	module.exports.usersecretkeys = dbConnInstance.collection("usersecretkeys");
+	module.exports.users = dbConnInstance.collection("users");
 
-
+	app.locals.dbConn = dbConnInstance;
+	
 	/**
 	 * Controllers (route handlers).
 	 */
@@ -211,7 +212,7 @@ MongoClient.connect( processEnv.MONGODB_URI || '', {useUnifiedTopology: true} ).
 	app.use(passport.session());
 	
 	
-	app.get( '/api/v1/mailing/login', mailingController.v_mailingLogin );
+	app.get( '/api/v1/mailing/login', userController.v_mailingLogin );
 	
 	app.post( '/api/v1/mailing/login',
 		bodyParser.urlencoded({extended:true, limit: '1000k'}), userController.verifyToken,

@@ -12,11 +12,6 @@ const fsPromises = require('fs').promises;
 const mailing = require('./mailing');
 const _mailingState = mailing.mailingState;
 const baseRedirFolder = ( process.env.baseFolder || "" ) + "/api/v1/mailing/";
-const crypto = require('crypto');
-const dbConn = module.parent.exports.dbConn;
-
-const NO_USER = "noUser";
-
 
 async function renderTemplate( tmplName, data ) {
 	// Get the view, mustache template
@@ -33,13 +28,13 @@ async function renderTemplate( tmplName, data ) {
 exports.v_mailingManage = async ( req, res, next ) => {
 
 	const userId = req.body.userId;
-	console.log(" v_mailingManage 1 ");
+	
 	if ( !req.user.accessToTopicId ) {
 		res.status( 401 );
 		res.end();
 		return
 	}
-	console.log(" v_mailingManage 2 ");
+	
 	// Get the topic ID group the
 	let topics = req.user.accessToTopicId;
 	
@@ -47,7 +42,7 @@ exports.v_mailingManage = async ( req, res, next ) => {
 	let mailings = await mailing.mailingListing( topics );
 
 	const mustacheData = Object.assign( {}, { topics: topics }, { mailings: mailings } );
-	console.log(" v_mailingManage 3 ");
+	
 	//console.log( mustacheData );
 
 	// Show a list of mailingID
@@ -55,38 +50,6 @@ exports.v_mailingManage = async ( req, res, next ) => {
 	res.status( 200 ).send( await renderTemplate( "mailingManage.html",  mustacheData ) );
 }
 
-/*
- * Mailing login
- */
-exports.v_mailingLogin = async ( req, res, next ) => {
-
-	
-	let secretkey =  crypto.randomBytes(64).toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
-	console.log("secretKey is created " + secretkey);
-
-	dbConn.collection( "usersecretkeys" ).replaceOne( 
-		{ name: NO_USER },
-		{ name: NO_USER, secretkey: secretkey },
-		{ upsert : true}
-	).then( () => {
-		console.log("1 document inserted on api /api/v1/mailing/login ");
-	}).catch( ( e ) => { 
-		console.log( "err while generate secretKey on api /test/getSecretKey" );
-		console.log( e );
-	});
-
-	
-	var mailingLoginTemplate = await fsPromises.readFile('views/mailingLogin.mustache', 'UTF-8');
-
-	mailingLoginTemplate = mustache.render(mailingLoginTemplate,
-		{
-			secretkey: secretkey
-				
-		}
-);
-	
-    res.status( 200 ).send(mailingLoginTemplate);
-}
 
 exports.v_mailingEdit = async ( req, res, next ) => {
 	// Input: MailingID
